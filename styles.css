@@ -24,7 +24,7 @@ a:active {
 }
 
 a:hover {
-    color: #FA7003;
+    color: #A0000F;
 }
 
 img {
@@ -32,4 +32,8 @@ img {
     margin-left: auto;
     margin-right: auto;
     width: 50%;
+}
+
+.centered {
+    text-align: center;
 }
