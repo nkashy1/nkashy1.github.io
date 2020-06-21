@@ -36,7 +36,7 @@ a:hover {
     color: #A0000F;
 }
 
-img {
+img, svg.centered {
     display: block;
     margin-left: auto;
     margin-right: auto;
