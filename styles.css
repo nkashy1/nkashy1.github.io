@@ -1,18 +1,18 @@
 body {
     background-color: black;
-    color: #FF7F50;
-    margin-left: 12.5%;
-    margin-right: 12.5%;
-    margin-top: 1%;
-    margin-bottom: 1%;
+    color: #F88E21;
+    margin-left: 25%;
+    margin-right: 25%;
 }
 
-h1 {
+.main {
     text-align: center;
+    margin-top: 2%;
+    margin-bottom: 2%
 }
 
 a:link {
-    color: #FF7F50;
+    color: #F97900;
 }
 
 a:visited {
@@ -25,4 +25,11 @@ a:active {
 
 a:hover {
     color: #FA7003;
+}
+
+img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%;
 }
