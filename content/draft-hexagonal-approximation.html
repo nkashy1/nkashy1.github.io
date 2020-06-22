@@ -4,6 +4,7 @@
         <meta charset="utf-8">
         <title>Hexagonal approximations to images</title>
         <link rel="stylesheet" href="../styles.css">
+        <link rel="stylesheet" href="../static/2020-06-21-hex-grid/styles.css">
 
         <script>
             const HEXMAP = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F"];
@@ -37,7 +38,7 @@
                 const baseYOffset = Math.sin(2*Math.PI/6);
 
                 const viewBoxMaxX = 2*columns + 2*Math.floor(columns/2) + 1.5;
-                const viewBoxMaxY = 2*rows*baseYOffset;
+                const viewBoxMaxY = rows*baseYOffset + 1;
                 const viewBox = `0 0 ${viewBoxMaxX} ${viewBoxMaxY}`;
                 const grid = document.createElementNS("http://www.w3.org/2000/svg", "svg");
                 grid.setAttribute("id", gridId);
@@ -94,10 +95,57 @@
         <hr>
 
         <div class="content">
+            <p>
+                In this note, we will see how to use the basic hexagonal grid we rendered in the
+                <a href="./2020-06-21-hex-grid.html">previous note</a> to make images interactive.
+                The technique we use here is to render a basic hexagonal grid and then modify its
+                fill colors to match the colors the image we want to load.
+            </p>
+            <p>
+                The technique has many possible applications. One could use it to make a cartoonish
+                version of a real image to use, for example, in a game. One could also use it as the
+                basis of an image annotation and segmentation service for Machine Learning purposes.
+            </p>
+        </div>
+
+        <div class="content">
+            <p>
+                We start with this picture of my cat, Pepper. Isn't she amazing?
+            </p>
+
             <img id="peppercat" src="../images/draft-hexagonal-approximation/pepper.jpg" alt="Pepper, my tortoiseshell cat" title="Pepper, my tortoiseshell cat">
         </div>
 
-        <div id="pepperGridContainer">
+        <div class="content">
+            <p>
+                The idea is simple - we just map the pixels of the source image (sufficiently
+                downsampled depending on the level of coarseness we want our grid to have) to
+                certain points on each hexagon in the grid. In the case of this page, I used the
+                six vertices of each hexagon, as well as the additional points lying at the
+                intersections of:
+            </p>
+
+            <p>
+                <ol>
+                    <li>
+                        The vertical lines through the vertices of the hexagon that are not
+                        incident to the horizontal line through its centroid.
+                    </li>
+                    <li>
+                        The horizontal lines through all the vertices of the hexagon.
+                    </li>
+                </ol>
+            </p>
+
+            <p>
+                With the mapping made, we take the average RGB values of the corresponding pixels
+                of the image as the fill color for each hexagon.
+            </p>
+
+            <p>
+                To see the implementation of this algorithm, inspect this element in your browser
+                and scroll down to see the script.
+            </p>
         </div>
 
         <script>
@@ -146,27 +194,26 @@
                 return [Math.floor(totalRed/numPixels), Math.floor(totalGreen/numPixels), Math.floor(totalBlue/numPixels)];
             }
 
-            function renderPepperApproximation() {
+            function renderPepperApproximation(horizontalScale, verticalScale, parentId, svgId) {
                 const canvas = document.createElement("canvas");
                 canvas.setAttribute("id", "pepperCanvas");
 
                 const pepper = document.getElementById("peppercat");
-                canvas.width = pepper.width;
-                canvas.height = pepper.height;
+                canvas.width = pepper.width/horizontalScale;
+                canvas.height = pepper.height/verticalScale;
                 const canvasCtx = canvas.getContext("2d");
                 canvasCtx.drawImage(pepper, 0, 0, canvas.width, canvas.height);
                 const imageArray = canvasCtx.getImageData(0, 0, canvas.width, canvas.height).data;
 
                 const gridWidth = Math.floor(Math.floor((canvas.width - 1)/3)/2);
                 const gridHeight = 2*Math.floor((canvas.height - 1)/2) - 1;
-                renderHexGrid("pepperGridContainer", gridHeight, gridWidth, "pepperGrid", true, true);
+                renderHexGrid(parentId, gridHeight, gridWidth, svgId, true, true);
 
                 for (var i = 0; i < gridHeight; i++) {
                     for (var j = 0; j < gridWidth; j++) {
-                        const polygonId = `pepperGrid-row-${i}-polygon-${j}`;
+                        const polygonId = `${svgId}-row-${i}-polygon-${j}`;
                         const polygon = document.getElementById(polygonId);
                         const pixels = pixelsForPolygon(i, j);
-                        console.log("Polygon:", polygonId, ", Pixels:", pixels.map((value) => {return `(${value[0]},${value[1]})`}));
                         const averageRGB = averageRGBForPixels(imageArray, pixels, canvas.width);
                         const redValue = averageRGB[0];
                         const greenValue = averageRGB[1];
@@ -176,8 +223,37 @@
                     }
                 }
             }
+        </script>
 
-            renderPepperApproximation();
+        <hr>
+
+        <div id="content">
+            <p>
+                Here is a realistic, interactive, SVG rendering of Pepper on a fine hexagonal grid.
+            </p>
+        </div>
+
+        <div id="pepperGridFineContainer">
+        </div>
+
+        <script>
+            renderPepperApproximation(1, 1, "pepperGridFineContainer", "pepperGridFine");
+        </script>
+
+        <hr>
+
+        <div id="content">
+            <p>
+                Here is a cartoonish, interactive, SVG rendering of Pepper on a coarse hexagonal
+                grid.
+            </p>
+        </div>
+
+        <div id="pepperGridCoarseContainer">
+        </div>
+
+        <script>
+            renderPepperApproximation(3, 4, "pepperGridCoarseContainer", "pepperGridCoarse");
         </script>
     </body>
 </html>
