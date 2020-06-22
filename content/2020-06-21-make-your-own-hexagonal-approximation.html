@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Make your own hexagonal approximation</title>
+        <link rel="stylesheet" href="../styles.css">
+        <link rel="stylesheet" href="../static/2020-06-21-hex-grid/styles.css">
+
+        <script>
+            const HEXMAP = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F"];
+            function uint8ToHexString(inputValue) {
+                const higherOrder = Math.floor(inputValue/16);
+                const lowerOrder = inputValue - higherOrder*16;
+                return `${HEXMAP[higherOrder]}${HEXMAP[lowerOrder]}`;
+            }
+
+            function renderHexGrid(parentId, rows, columns, gridId, interactive, force) {
+                const parent = document.getElementById(parentId);
+                if (!parent) {
+                    console.error(`Could not find parent element with id: ${parentId}`);
+                    return false;
+                }
+
+                // If an element already exists with id <gridId> and force is falsey, log error
+                // to console and finish.
+                // Remove element with id <gridId> if it already exists and if force is truthy.
+                const existing = document.getElementById(gridId);
+                if (existing) {
+                    if (!force) {
+                        console.error(`Could not create grid because an element already exists with the desired id: ${gridId}`);
+                        return false;
+                    }
+                    existing.parentNode.removeChild(existing);
+                }
+
+                const baseYOffset = Math.sin(2*Math.PI/6);
+
+                const viewBoxMaxX = 2*columns + 2*Math.floor(columns/2) + 1.5;
+                const viewBoxMaxY = rows*baseYOffset + 1;
+                const viewBox = `0 0 ${viewBoxMaxX} ${viewBoxMaxY}`;
+                const grid = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                grid.setAttribute("id", gridId);
+                grid.setAttribute("viewBox", viewBox);
+                grid.classList.add("centered");
+
+                var i, j;
+                for (i = 0; i < rows; i++) {
+                    const rowId = `${gridId}-row-${i}`;
+                    const row = document.createElementNS("http://www.w3.org/2000/svg", "g");
+                    row.setAttribute("id", rowId);
+                    row.classList.add("hexagon");
+
+                    let xOffset = 0;
+                    if (i % 2 == 1) {
+                        xOffset = 1.5;
+                    }
+                    const yOffset = i*baseYOffset;
+                    row.setAttribute("transform", `translate(${xOffset} ${yOffset})`);
+
+                    for (j = 0; j < columns; j++) {
+                        //<polygon class="interactive" fill="#F88E21" stroke="#000000" stroke-width="0.02" points="2,0.86602540378 1.5,0 0.5,0 0,0.86602540378 0.5,1.73205080756 1.5,1.73205080756"></polygon>
+                        const polygonId = `${rowId}-polygon-${j}`;
+                        const xTranslation = 3*j;
+                        const points = `${xTranslation+2},${baseYOffset} ${xTranslation+1.5},0 ${xTranslation+0.5},0 ${xTranslation},${baseYOffset} ${xTranslation+0.5},${2*baseYOffset} ${xTranslation+1.5},${2*baseYOffset}`;
+                        const polygon = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+                        polygon.setAttribute("id", polygonId);
+                        polygon.setAttribute("fill", "#F88E21");
+                        polygon.setAttribute("stroke", "#000000");
+                        polygon.setAttribute("stroke-width", "0.02");
+                        polygon.setAttribute("points", points);
+                        if (interactive) {
+                            polygon.classList.add("interactive");
+                        }
+                        row.appendChild(polygon);
+                    }
+
+                    grid.appendChild(row);
+                }
+
+                parent.appendChild(grid);
+                return true;
+            }
+
+            function pixelsForPolygon(row, column) {
+                let verticalStart = 2*Math.floor(row/2);
+                if (row%2 == 1) {
+                    verticalStart++;
+                }
+
+                let horizontalStart = 2*3*column + 1;
+                if (row%2 == 1) {
+                    horizontalStart = horizontalStart + 3;
+                }
+
+                // Scan hexagons left to right, and top to bottom
+                const pixels = [
+                    [horizontalStart, verticalStart+1],
+                    [horizontalStart+1, verticalStart],
+                    [horizontalStart+1, verticalStart+1],
+                    [horizontalStart+1, verticalStart+2],
+                    [horizontalStart+2, verticalStart],
+                    [horizontalStart+2, verticalStart+1],
+                    [horizontalStart+2, verticalStart+2],
+                    [horizontalStart+3, verticalStart],
+                    [horizontalStart+3, verticalStart+1],
+                    [horizontalStart+3, verticalStart+2],
+                    [horizontalStart+4, verticalStart+1]
+                ];
+
+                return pixels;
+            }
+
+            function averageRGBForPixels(imageDataArray, pixels, imageWidth) {
+                let numPixels = 0;
+                let totalRed = 0;
+                let totalGreen = 0;
+                let totalBlue = 0;
+                pixels.forEach((pixel, i) => {
+                    numPixels++;
+                    const startingIndex = (pixel[1]*imageWidth + pixel[0])*4;
+                    totalRed = totalRed + imageDataArray[startingIndex];
+                    totalGreen = totalGreen + imageDataArray[startingIndex+1];
+                    totalBlue = totalBlue + imageDataArray[startingIndex+2];
+                });
+
+                return [Math.floor(totalRed/numPixels), Math.floor(totalGreen/numPixels), Math.floor(totalBlue/numPixels)];
+            }
+
+            function renderSourceImageApproximation(horizontalScale, verticalScale, parentId, svgId) {
+                const canvas = document.createElement("canvas");
+                canvas.setAttribute("id", "sourceImageCanvas");
+
+                const sourceImage = document.getElementById("sourceImage");
+                sourceImage.crossOrigin = "anonymous";
+                canvas.width = sourceImage.width/horizontalScale;
+                canvas.height = sourceImage.height/verticalScale;
+                const canvasCtx = canvas.getContext("2d");
+                canvasCtx.drawImage(sourceImage, 0, 0, canvas.width, canvas.height);
+                const imageArray = canvasCtx.getImageData(0, 0, canvas.width, canvas.height).data;
+
+                const gridWidth = Math.floor(Math.floor((canvas.width - 1)/3)/2);
+                const gridHeight = 2*Math.floor((canvas.height - 1)/2) - 1;
+                renderHexGrid(parentId, gridHeight, gridWidth, svgId, true, true);
+
+                for (var i = 0; i < gridHeight; i++) {
+                    for (var j = 0; j < gridWidth; j++) {
+                        const polygonId = `${svgId}-row-${i}-polygon-${j}`;
+                        const polygon = document.getElementById(polygonId);
+                        const pixels = pixelsForPolygon(i, j);
+                        const averageRGB = averageRGBForPixels(imageArray, pixels, canvas.width);
+                        const redValue = averageRGB[0];
+                        const greenValue = averageRGB[1];
+                        const blueValue = averageRGB[2];
+                        const fillValue = `#${uint8ToHexString(redValue)}${uint8ToHexString(greenValue)}${uint8ToHexString(blueValue)}`;
+                        polygon.setAttribute("fill", fillValue);
+                    }
+                }
+            }
+
+            // Adapted from: https://stackoverflow.com/a/23218877
+            function downloadSVG(svgId, linkId) {
+                //get svg element.
+                var svg = document.getElementById(svgId);
+
+                //get svg source.
+                var serializer = new XMLSerializer();
+                var source = serializer.serializeToString(svg);
+
+                //add name spaces.
+                if(!source.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)){
+                    source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
+                }
+                if(!source.match(/^<svg[^>]+"http\:\/\/www\.w3\.org\/1999\/xlink"/)){
+                    source = source.replace(/^<svg/, '<svg xmlns:xlink="http://www.w3.org/1999/xlink"');
+                }
+
+                //add xml declaration
+                source = '<?xml version="1.0" standalone="no"?>\r\n' + source;
+
+                //convert svg source to URI data scheme.
+                var url = "data:image/svg+xml;charset=utf-8,"+encodeURIComponent(source);
+
+                //set url value to a element's href attribute.
+                document.getElementById(linkId).href = url;
+                //you can download svg file by right click menu.
+            }
+
+            function loadImage() {
+                const imageURL = document.getElementById("imageURL").value;
+                const image = document.getElementById("sourceImage");
+                image.setAttribute("src", imageURL);
+            }
+
+            function loadApproximation() {
+                const horizontalScale = document.getElementById("horizontalCoarseness").value;
+                const verticalScale = document.getElementById("verticalCoarseness").value;
+                renderSourceImageApproximation(horizontalScale, verticalScale, "gridContainer", "gridApproximation");
+                downloadSVG("gridApproximation", "svgDownload");
+            }
+        </script>
+    </head>
+
+    <body>
+        <div class="main">
+            <h2>Make your own hexagonal approximation</h2>
+            <p>June 21, 2020</p>
+            <p><a href="../index.html">Home</a></p>
+        </div>
+
+        <hr>
+
+        <div class="content">
+            <p>
+                On this page, you can make your own hexagonal approximation to any image from the
+                internet.
+            </p>
+            <p>
+                First, paste an image URL into the URL input and hit "Load image".
+            </p>
+            <p>
+                Once the image has been loaded, put positive numbers in the horizontal and vertical
+                coarseness inputs and hit "Approximate".
+            </p>
+        </div>
+
+        <form>
+            <p>
+            URL: <input type="text" name="imageURL" id="imageURL" size="20"></input>
+            <button type="button" onclick="loadImage()">Load image</button><br>
+            </p>
+            <p>
+            Horizontal coarseness: <input type="text" name="horizontalCoarseness" id="horizontalCoarseness" value="3" size="2"></input><br>
+            Vertical coarseness: &nbsp; <input type="text" name="verticalCoarseness" id="verticalCoarseness" value="3" size="2"></input><br>
+            <button type="button" onclick="loadApproximation()">Approximate</button>
+            </p>
+        </form>
+
+        <div class="content" id="imgContainer">
+            <img id="sourceImage">
+        </div>
+
+        <div class="content" id="gridContainer">
+        </div>
+
+        <div class="content centered">
+            <a class="centered" id="svgDownload" download="fine.svg">Download SVG</a>
+        </div>
+    </body>
+</html>
