@@ -192,9 +192,9 @@
             }
 
             function loadApproximation() {
-                const horizontalScale = document.getElementById("horizontalCoarseness").value;
-                const verticalScale = document.getElementById("verticalCoarseness").value;
-                renderSourceImageApproximation(horizontalScale, verticalScale, "gridContainer", "gridApproximation");
+                const horizontalCoarseness = document.getElementById("horizontalCoarseness").value;
+                const verticalCoarseness = document.getElementById("verticalCoarseness").value;
+                renderSourceImageApproximation(verticalCoarseness, horizontalCoarseness, "gridContainer", "gridApproximation");
                 downloadSVG("gridApproximation", "svgDownload");
             }
         </script>
