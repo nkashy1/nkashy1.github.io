@@ -13,9 +13,7 @@
                 const lowerOrder = inputValue - higherOrder*16;
                 return `${HEXMAP[higherOrder]}${HEXMAP[lowerOrder]}`;
             }
-        </script>
 
-        <script>
             function renderHexGrid(parentId, rows, columns, gridId, interactive, force) {
                 const parent = document.getElementById(parentId);
                 if (!parent) {
@@ -82,73 +80,7 @@
                 parent.appendChild(grid);
                 return true;
             }
-        </script>
-    </head>
 
-    <body>
-        <div class="main">
-            <h2>Hexagonal approximations to images</h2>
-            <p>Draft</p>
-            <p><a href="../index.html">Home</a></p>
-        </div>
-
-        <hr>
-
-        <div class="content">
-            <p>
-                In this note, we will see how to use the basic hexagonal grid we rendered in the
-                <a href="./2020-06-21-hex-grid.html">previous note</a> to make images interactive.
-                The technique we use here is to render a basic hexagonal grid and then modify its
-                fill colors to match the colors the image we want to load.
-            </p>
-            <p>
-                The technique has many possible applications. One could use it to make a cartoonish
-                version of a real image to use, for example, in a game. One could also use it as the
-                basis of an image annotation and segmentation service for Machine Learning purposes.
-            </p>
-        </div>
-
-        <div class="content">
-            <p>
-                We start with this picture of my cat, Pepper. Isn't she amazing?
-            </p>
-
-            <img id="peppercat" src="../images/draft-hexagonal-approximation/pepper.jpg" alt="Pepper, my tortoiseshell cat" title="Pepper, my tortoiseshell cat">
-        </div>
-
-        <div class="content">
-            <p>
-                The idea is simple - we just map the pixels of the source image (sufficiently
-                downsampled depending on the level of coarseness we want our grid to have) to
-                certain points on each hexagon in the grid. In the case of this page, I used the
-                six vertices of each hexagon, as well as the additional points lying at the
-                intersections of:
-            </p>
-
-            <p>
-                <ol>
-                    <li>
-                        The vertical lines through the vertices of the hexagon that are not
-                        incident to the horizontal line through its centroid.
-                    </li>
-                    <li>
-                        The horizontal lines through all the vertices of the hexagon.
-                    </li>
-                </ol>
-            </p>
-
-            <p>
-                With the mapping made, we take the average RGB values of the corresponding pixels
-                of the image as the fill color for each hexagon.
-            </p>
-
-            <p>
-                To see the implementation of this algorithm, inspect this element in your browser
-                and scroll down to see the script.
-            </p>
-        </div>
-
-        <script>
             function pixelsForPolygon(row, column) {
                 let verticalStart = 2*Math.floor(row/2);
                 if (row%2 == 1) {
@@ -223,7 +155,76 @@
                     }
                 }
             }
+
+            window.onload = function() {
+                renderPepperApproximation(1, 1, "pepperGridFineContainer", "pepperGridFine");
+                renderPepperApproximation(3, 4, "pepperGridCoarseContainer", "pepperGridCoarse");
+            };
         </script>
+    </head>
+
+    <body>
+        <div class="main">
+            <h2>Hexagonal approximations to images</h2>
+            <p>June 21, 2020</p>
+            <p><a href="../index.html">Home</a></p>
+        </div>
+
+        <hr>
+
+        <div class="content">
+            <p>
+                In this note, we will see how to use the basic hexagonal grid we rendered in the
+                <a href="./2020-06-21-hex-grid.html">previous note</a> to make images interactive.
+                The technique we use here is to render a basic hexagonal grid and then modify its
+                fill colors to match the colors the image we want to load.
+            </p>
+            <p>
+                The technique has many possible applications. One could use it to make a cartoonish
+                version of a real image to use, for example, in a game. One could also use it as the
+                basis of an image annotation and segmentation service for Machine Learning purposes.
+            </p>
+        </div>
+
+        <div class="content">
+            <p>
+                We start with this picture of my cat, Pepper. Isn't she amazing?
+            </p>
+
+            <img id="peppercat" src="../images/2020-06-21-hexagonal-approximation/pepper.jpg" alt="Pepper, my tortoiseshell cat" title="Pepper, my tortoiseshell cat">
+        </div>
+
+        <div class="content">
+            <p>
+                The idea is simple - we just map the pixels of the source image (sufficiently
+                downsampled depending on the level of coarseness we want our grid to have) to
+                certain points on each hexagon in the grid. In the case of this page, I used the
+                six vertices of each hexagon, as well as the additional points lying at the
+                intersections of:
+            </p>
+
+            <p>
+                <ol>
+                    <li>
+                        The vertical lines through the vertices of the hexagon that are not
+                        incident to the horizontal line through its centroid.
+                    </li>
+                    <li>
+                        The horizontal lines through all the vertices of the hexagon.
+                    </li>
+                </ol>
+            </p>
+
+            <p>
+                With the mapping made, we take the average RGB values of the corresponding pixels
+                of the image as the fill color for each hexagon.
+            </p>
+
+            <p>
+                To see the implementation of this algorithm, inspect the source to this page in your
+                browser and look at the <code>script</code> defined in the header.
+            </p>
+        </div>
 
         <hr>
 
@@ -236,10 +237,6 @@
         <div id="pepperGridFineContainer">
         </div>
 
-        <script>
-            renderPepperApproximation(1, 1, "pepperGridFineContainer", "pepperGridFine");
-        </script>
-
         <hr>
 
         <div id="content">
@@ -251,9 +248,5 @@
 
         <div id="pepperGridCoarseContainer">
         </div>
-
-        <script>
-            renderPepperApproximation(3, 4, "pepperGridCoarseContainer", "pepperGridCoarse");
-        </script>
     </body>
 </html>
