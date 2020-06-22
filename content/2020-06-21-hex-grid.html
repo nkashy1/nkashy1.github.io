@@ -100,6 +100,21 @@
         <div class="content" id="dynamicGridContainer">
             <h3>Dynamic grid of SVG hexagons</h3>
 
+            <div class="content">
+                <p>
+                    Now we define a Javascript function which renders each row of the grid for us -
+                    imaginatively named <code>renderHexGrid</code>. We define a wrapper called
+                    <code>setHexGridParameters</code> which reads the parameters specified in a form
+                    and updates the grid accordingly.
+                </p>
+                <p>
+                    We creatively define the number of rows on a hexagonal grid to be the number of
+                    distinct horizontal lines along which the centroids of the hexagons in the grid
+                    lie. Similarly we define the number of columns as the number of distinct vertical
+                    lines along which the centroids lie.
+                </p>
+            </div>
+
             <script>
                 function renderHexGrid(parentId, rows, columns, gridId, interactive, force) {
                     const parent = document.getElementById(parentId);
