@@ -131,7 +131,6 @@
                 canvas.setAttribute("id", "sourceImageCanvas");
 
                 const sourceImage = document.getElementById("sourceImage");
-                sourceImage.crossOrigin = "anonymous";
                 canvas.width = sourceImage.width/horizontalScale;
                 canvas.height = sourceImage.height/verticalScale;
                 const canvasCtx = canvas.getContext("2d");
@@ -236,7 +235,7 @@
         </form>
 
         <div class="content" id="imgContainer">
-            <img id="sourceImage">
+            <img id="sourceImage" crossorigin="anonymous">
         </div>
 
         <div class="content" id="gridContainer">
