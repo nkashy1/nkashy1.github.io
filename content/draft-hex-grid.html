@@ -12,9 +12,9 @@
         <script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
         <!-- To automatically render math in text elements, include the auto-render extension: -->
         <script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"
-            onload="renderMathInElement(document.body);"></script>
-
-    </head>
+            onload="renderMathInElement(document.body);">
+        </script>
+   </head>
 
     <body>
         <div class="main">
@@ -26,9 +26,22 @@
         <hr>
 
         <div class="content">
+            <p>
+                These notes iteratively build up to the dynamic rendering of a portion of a grid of
+                regular hexagons using HTML, CSS, and Javascript.
+            </p>
+            <p>
+                To view the implementation at any stage in the process, just right click on the
+                desired element and inspect it.
+            </p>
+        </div>
+
+        <hr>
+
+        <div class="content">
             <h3>Single SVG hexagon</h3>
             <svg class="hexagon centered" viewBox="0 0 2 1.73205080756">
-                <polygon points="2,0.86602540378 1.5,0 0.5,0 0,0.86602540378 0.5,1.73205080756 1.5,1.73205080756" style="fill:#F88E21; stroke:#000000; stroke-width:0.02;"></polygon>
+                <polygon fill="#F88E21" stroke="#000000" stroke-width="0.02" points="2,0.86602540378 1.5,0 0.5,0 0,0.86602540378 0.5,1.73205080756 1.5,1.73205080756"></polygon>
             </svg>
             <p class="math">
                 We are using the <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Element/svg">HTML SVG tag</a> to render this hexagon.
@@ -44,33 +57,136 @@
 
         <div class="content">
             <h3>Grid of SVG hexagons</h3>
-            <svg class="centered" viewBox="0 0 11 5.19615242268" overflow="clip">
+            <svg class="centered" viewBox="0 0 9.5 5.19615242268">
                 <g class="hexagon">
-                    <polygon points="2,0.86602540378 1.5,0 0.5,0 0,0.86602540378 0.5,1.73205080756 1.5,1.73205080756" style="fill:#F88E21; stroke:#000000; stroke-width:0.02;"></polygon>
-                    <polygon points="5,0.86602540378 4.5,0 3.5,0 3,0.86602540378 3.5,1.73205080756 4.5,1.73205080756" style="fill:#F88E21; stroke:#000000; stroke-width:0.02;"></polygon>
-                    <polygon points="8,0.86602540378 7.5,0 6.5,0 6,0.86602540378 6.5,1.73205080756 7.5,1.73205080756" style="fill:#F88E21; stroke:#000000; stroke-width:0.02;"></polygon>
+                    <polygon class="interactive" fill="#F88E21" stroke="#000000" stroke-width="0.02" points="2,0.86602540378 1.5,0 0.5,0 0,0.86602540378 0.5,1.73205080756 1.5,1.73205080756"></polygon>
+                    <polygon class="interactive" fill="#F88E21" stroke="#000000" stroke-width="0.02" points="5,0.86602540378 4.5,0 3.5,0 3,0.86602540378 3.5,1.73205080756 4.5,1.73205080756"></polygon>
+                    <polygon class="interactive" fill="#F88E21" stroke="#000000" stroke-width="0.02" points="8,0.86602540378 7.5,0 6.5,0 6,0.86602540378 6.5,1.73205080756 7.5,1.73205080756"></polygon>
                 </g>
                 <g class="hexagon" transform="translate(1.5 0.866025403784439)">
-                    <polygon points="2,0.86602540378 1.5,0 0.5,0 0,0.86602540378 0.5,1.73205080756 1.5,1.73205080756" style="fill:#F88E21; stroke:#000000; stroke-width:0.02;"></polygon>
-                    <polygon points="5,0.86602540378 4.5,0 3.5,0 3,0.86602540378 3.5,1.73205080756 4.5,1.73205080756" style="fill:#F88E21; stroke:#000000; stroke-width:0.02;"></polygon>
-                    <polygon points="8,0.86602540378 7.5,0 6.5,0 6,0.86602540378 6.5,1.73205080756 7.5,1.73205080756" style="fill:#F88E21; stroke:#000000; stroke-width:0.02;"></polygon>
+                    <polygon class="interactive" fill="#F88E21" stroke="#000000" stroke-width="0.02" points="2,0.86602540378 1.5,0 0.5,0 0,0.86602540378 0.5,1.73205080756 1.5,1.73205080756"></polygon>
+                    <polygon class="interactive" fill="#F88E21" stroke="#000000" stroke-width="0.02" points="5,0.86602540378 4.5,0 3.5,0 3,0.86602540378 3.5,1.73205080756 4.5,1.73205080756"></polygon>
+                    <polygon class="interactive" fill="#F88E21" stroke="#000000" stroke-width="0.02" points="8,0.86602540378 7.5,0 6.5,0 6,0.86602540378 6.5,1.73205080756 7.5,1.73205080756"></polygon>
                 </g>
                 <g class="hexagon" transform="translate(0 1.73205080756)">
-                    <polygon points="2,0.86602540378 1.5,0 0.5,0 0,0.86602540378 0.5,1.73205080756 1.5,1.73205080756" style="fill:#F88E21; stroke:#000000; stroke-width:0.02;"></polygon>
-                    <polygon points="5,0.86602540378 4.5,0 3.5,0 3,0.86602540378 3.5,1.73205080756 4.5,1.73205080756" style="fill:#F88E21; stroke:#000000; stroke-width:0.02;"></polygon>
-                    <polygon points="8,0.86602540378 7.5,0 6.5,0 6,0.86602540378 6.5,1.73205080756 7.5,1.73205080756" style="fill:#F88E21; stroke:#000000; stroke-width:0.02;"></polygon>
+                    <polygon class="interactive" fill="#F88E21" stroke="#000000" stroke-width="0.02" points="2,0.86602540378 1.5,0 0.5,0 0,0.86602540378 0.5,1.73205080756 1.5,1.73205080756"></polygon>
+                    <polygon class="interactive" fill="#F88E21" stroke="#000000" stroke-width="0.02" points="5,0.86602540378 4.5,0 3.5,0 3,0.86602540378 3.5,1.73205080756 4.5,1.73205080756"></polygon>
+                    <polygon class="interactive" fill="#F88E21" stroke="#000000" stroke-width="0.02" points="8,0.86602540378 7.5,0 6.5,0 6,0.86602540378 6.5,1.73205080756 7.5,1.73205080756"></polygon>
                 </g>
                 <g class="hexagon" transform="translate(1.5 2.59807621134)">
-                    <polygon points="2,0.86602540378 1.5,0 0.5,0 0,0.86602540378 0.5,1.73205080756 1.5,1.73205080756" style="fill:#F88E21; stroke:#000000; stroke-width:0.02;"></polygon>
-                    <polygon points="5,0.86602540378 4.5,0 3.5,0 3,0.86602540378 3.5,1.73205080756 4.5,1.73205080756" style="fill:#F88E21; stroke:#000000; stroke-width:0.02;"></polygon>
-                    <polygon points="8,0.86602540378 7.5,0 6.5,0 6,0.86602540378 6.5,1.73205080756 7.5,1.73205080756" style="fill:#F88E21; stroke:#000000; stroke-width:0.02;"></polygon>
+                    <polygon class="interactive" fill="#F88E21" stroke="#000000" stroke-width="0.02" points="2,0.86602540378 1.5,0 0.5,0 0,0.86602540378 0.5,1.73205080756 1.5,1.73205080756"></polygon>
+                    <polygon class="interactive" fill="#F88E21" stroke="#000000" stroke-width="0.02" points="5,0.86602540378 4.5,0 3.5,0 3,0.86602540378 3.5,1.73205080756 4.5,1.73205080756"></polygon>
+                    <polygon class="interactive" fill="#F88E21" stroke="#000000" stroke-width="0.02" points="8,0.86602540378 7.5,0 6.5,0 6,0.86602540378 6.5,1.73205080756 7.5,1.73205080756"></polygon>
                 </g>
                 <g class="hexagon" transform="translate(0 3.46410161512)">
-                    <polygon points="2,0.86602540378 1.5,0 0.5,0 0,0.86602540378 0.5,1.73205080756 1.5,1.73205080756" style="fill:#F88E21; stroke:#000000; stroke-width:0.02;"></polygon>
-                    <polygon points="5,0.86602540378 4.5,0 3.5,0 3,0.86602540378 3.5,1.73205080756 4.5,1.73205080756" style="fill:#F88E21; stroke:#000000; stroke-width:0.02;"></polygon>
-                    <polygon points="8,0.86602540378 7.5,0 6.5,0 6,0.86602540378 6.5,1.73205080756 7.5,1.73205080756" style="fill:#F88E21; stroke:#000000; stroke-width:0.02;"></polygon>
+                    <polygon class="interactive" fill="#F88E21" stroke="#000000" stroke-width="0.02" points="2,0.86602540378 1.5,0 0.5,0 0,0.86602540378 0.5,1.73205080756 1.5,1.73205080756"></polygon>
+                    <polygon class="interactive" fill="#F88E21" stroke="#000000" stroke-width="0.02" points="5,0.86602540378 4.5,0 3.5,0 3,0.86602540378 3.5,1.73205080756 4.5,1.73205080756"></polygon>
+                    <polygon class="interactive" fill="#F88E21" stroke="#000000" stroke-width="0.02" points="8,0.86602540378 7.5,0 6.5,0 6,0.86602540378 6.5,1.73205080756 7.5,1.73205080756"></polygon>
                 </g>
             </svg>
+            <p>
+                This grid is hard coded as an SVG object consisting of one group per row, with each
+                row rendering hexagons whose centroids lie on the same horizontal line.
+            </p>
+            <p>
+                We set the <code>polygon.interactive:hover</code> style to fill polygons of the
+                <code>interactive</code> class that we hover over with the mouse cursor with the
+                color <code>#A0000F</code>.
+            </p>
+        </div>
+
+        <hr>
+
+        <div class="content" id="dynamicGridContainer">
+            <h3>Dynamic grid of SVG hexagons</h3>
+
+            <script>
+                function renderHexGrid(parentId, rows, columns, gridId, interactive, force) {
+                    const parent = document.getElementById(parentId);
+                    if (!parent) {
+                        console.error(`Could not find parent element with id: ${parentId}`);
+                        return false;
+                    }
+
+                    // If an element already exists with id <gridId> and force is falsey, log error
+                    // to console and finish.
+                    // Remove element with id <gridId> if it already exists and if force is truthy.
+                    const existing = document.getElementById(gridId);
+                    if (existing) {
+                        if (!force) {
+                            console.error(`Could not create grid because an element already exists with the desired id: ${gridId}`);
+                            return false;
+                        }
+                        existing.parentNode.removeChild(existing);
+                    }
+
+                    const baseYOffset = Math.sin(2*Math.PI/6);
+
+                    const viewBoxMaxX = 2*columns + 2*Math.floor(columns/2) + 1.5;
+                    const viewBoxMaxY = 2*rows*baseYOffset;
+                    const viewBox = `0 0 ${viewBoxMaxX} ${viewBoxMaxY}`;
+                    const grid = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                    grid.setAttribute("id", gridId);
+                    grid.setAttribute("viewBox", viewBox);
+                    grid.classList.add("centered");
+
+                    var i, j;
+                    for (i = 0; i < rows; i++) {
+                        const rowId = `${gridId}-row-${i}`;
+                        const row = document.createElementNS("http://www.w3.org/2000/svg", "g");
+                        row.setAttribute("id", rowId);
+                        row.classList.add("hexagon");
+
+                        let xOffset = 0;
+                        if (i % 2 == 1) {
+                            xOffset = 1.5;
+                        }
+                        const yOffset = i*baseYOffset;
+                        row.setAttribute("transform", `translate(${xOffset} ${yOffset})`);
+
+                        for (j = 0; j < columns; j++) {
+                            //<polygon class="interactive" fill="#F88E21" stroke="#000000" stroke-width="0.02" points="2,0.86602540378 1.5,0 0.5,0 0,0.86602540378 0.5,1.73205080756 1.5,1.73205080756"></polygon>
+                            const polygonId = `${rowId}-polygon-${j}`;
+                            const xTranslation = 3*j;
+                            const points = `${xTranslation+2},${baseYOffset} ${xTranslation+1.5},0 ${xTranslation+0.5},0 ${xTranslation},${baseYOffset} ${xTranslation+0.5},${2*baseYOffset} ${xTranslation+1.5},${2*baseYOffset}`;
+                            const polygon = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+                            polygon.setAttribute("id", polygonId);
+                            polygon.setAttribute("fill", "#F88E21");
+                            polygon.setAttribute("stroke", "#000000");
+                            polygon.setAttribute("stroke-width", "0.02");
+                            polygon.setAttribute("points", points);
+                            if (interactive) {
+                                polygon.classList.add("interactive");
+                            }
+                            row.appendChild(polygon);
+                        }
+
+                        grid.appendChild(row);
+                    }
+
+                    parent.appendChild(grid);
+                    return true;
+                }
+
+                function setHexGridParameters() {
+                    const rows = document.getElementById("rowsInput").value;
+                    const columns = document.getElementById("columnsInput").value;
+                    console.log('Rendering:', rows, columns)
+                    renderHexGrid("dynamicGridContainer", rows, columns, "dynamicGrid", true, true);
+                    return false;
+                }
+            </script>
+
+            <form class="centered">
+                <p>
+                    Rows: <input type="text" name="rowsInput" id="rowsInput" value="5"> Columns: <input type="text" name="columnsInput" id="columnsInput" value="3">
+                </p>
+                <p>
+                    <button type="button" onClick="setHexGridParameters(10, 4)">Refresh</button>
+                </p>
+            </form>
+
+            <script>renderHexGrid("dynamicGridContainer", 5, 3, "dynamicGrid", true, false);</script>
         </div>
     </body>
 </html>

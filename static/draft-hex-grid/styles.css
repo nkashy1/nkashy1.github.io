@@ -2,3 +2,7 @@ svg.hexagon, g.hexagon {
     height: 10%;
     width: 10%;
 }
+
+polygon.interactive:hover {
+    fill: #A0000F;
+}
