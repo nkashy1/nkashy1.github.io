@@ -156,9 +156,39 @@
                 }
             }
 
+            // Adapted from: https://stackoverflow.com/a/23218877
+            function downloadSVG(svgId, linkId) {
+                //get svg element.
+                var svg = document.getElementById(svgId);
+
+                //get svg source.
+                var serializer = new XMLSerializer();
+                var source = serializer.serializeToString(svg);
+
+                //add name spaces.
+                if(!source.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)){
+                    source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
+                }
+                if(!source.match(/^<svg[^>]+"http\:\/\/www\.w3\.org\/1999\/xlink"/)){
+                    source = source.replace(/^<svg/, '<svg xmlns:xlink="http://www.w3.org/1999/xlink"');
+                }
+
+                //add xml declaration
+                source = '<?xml version="1.0" standalone="no"?>\r\n' + source;
+
+                //convert svg source to URI data scheme.
+                var url = "data:image/svg+xml;charset=utf-8,"+encodeURIComponent(source);
+
+                //set url value to a element's href attribute.
+                document.getElementById(linkId).href = url;
+                //you can download svg file by right click menu.
+            }
+
             window.onload = function() {
                 renderPepperApproximation(1, 1, "pepperGridFineContainer", "pepperGridFine");
                 renderPepperApproximation(3, 4, "pepperGridCoarseContainer", "pepperGridCoarse");
+                downloadSVG("pepperGridFine", "fineSVG");
+                downloadSVG("pepperGridCoarse", "coarseSVG");
             };
         </script>
     </head>
@@ -237,6 +267,10 @@
         <div id="pepperGridFineContainer">
         </div>
 
+        <div class="content centered">
+            <a class="centered" id="fineSVG" download="fine.svg">Download SVG</a>
+        </div>
+
         <hr>
 
         <div id="content">
@@ -247,6 +281,10 @@
         </div>
 
         <div id="pepperGridCoarseContainer">
+        </div>
+
+        <div class="content centered">
+            <a id="coarseSVG" download="coarse.svg">Download SVG</a>
         </div>
     </body>
 </html>
